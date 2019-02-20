@@ -37,7 +37,9 @@ func TestString(t *testing.T) {
 		// {"a", 0, "a"}, // just for easy show in VSCode terminal
 	} {
 		out := truncate.String(test.s, test.limit)
-		if len(out) != len(test.expected) || norm.NFKD.String(out) != norm.NFKD.String(test.expected) {
+		if len(out) != len(test.expected) {
+			t.Errorf("%q, %d: got %q %04x, expecting %q %04x", test.s, test.limit, out, []rune(out), test.expected, []rune(test.expected))
+		} else if out != test.expected && norm.NFKD.String(out) != norm.NFKD.String(test.expected) {
 			t.Errorf("%q, %d: got %q %04x, expecting %q %04x", test.s, test.limit, out, []rune(out), test.expected, []rune(test.expected))
 		} else if out != test.expected {
 			// no exact match, but NFKD match => just a warning
