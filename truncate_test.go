@@ -34,7 +34,16 @@ func TestString(t *testing.T) {
 		{"x\u304B\u3099", 2, "x\u304C"},
 		{"e\u0301\u0303", 1, "é\u0303"},
 		{"e\u0303\u0301", 1, "\u1ebd\u0301"},
-		// {"a", 0, "a"}, // just for easy show in VSCode terminal
+		{"\u01B5\u0327\u0308", 1, "\u01B5\u0327\u0308"},  // https://www.unicode.org/faq/char_combmark.html#11
+		{"\u01B5\u0327\u0308é", 1, "\u01B5\u0327\u0308"}, // https://www.unicode.org/faq/char_combmark.html#11
+		{"\u0061\u0328\u0301é", 1, "\u0105\u0301"},       // https://www.unicode.org/faq/char_combmark.html#12
+		{"\u0061\u0328\u0301é", 1, "\u0105\u0301"},       // https://www.unicode.org/faq/char_combmark.html#12
+		/*
+			// TODO
+			{"c\u034fho", 2, "c\u034fh"},                     // https://www.unicode.org/faq/char_combmark.html#17
+			// TODO: U+035D COMBINING DOUBLE BREVE
+		*/
+		// {"a", 0, "a"},                                    // just for easy show in VSCode terminal
 	} {
 		out := truncate.String(test.s, test.limit)
 		if len(out) != len(test.expected) {
