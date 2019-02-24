@@ -57,7 +57,7 @@ func TestString(t *testing.T) {
 					}
 				} else
 			*/
-			if norm.NFKD.String(out) != norm.NFKD.String(test.expected) {
+			if norm.NFKD.String(out) == norm.NFKD.String(test.expected) {
 				// no exact match, but NFKD match => just a warning
 				printf = t.Logf
 			}
