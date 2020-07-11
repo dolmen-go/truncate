@@ -2,10 +2,10 @@
 package truncate
 
 import (
-	"bytes"
+	"strings"
 	"unicode/utf8"
 
-	"golang.org/x/text/unicode/norm"
+	"github.com/rivo/uniseg"
 )
 
 // String truncates a string to the given limit in Unicode characters (not just bytes or codepoints).
@@ -19,9 +19,13 @@ func String(s string, limit int) string {
 	// Note: we also check the byte just after the limit as it may be a complement of
 	// the last ASCII byte
 	pureASCII := true
+	endASCII := 0
 	for i := 0; i <= limit; i++ {
 		if s[i] >= utf8.RuneSelf {
 			pureASCII = false
+			if i > 0 {
+				endASCII = i - 1
+			}
 			break
 		}
 	}
@@ -29,14 +33,22 @@ func String(s string, limit int) string {
 		return s[:limit]
 	}
 
+	limit -= endASCII
+
 	// Use big artillery: Unicode semantics
-	var it norm.Iter
-	it.InitString(norm.NFC, s)
-	var b bytes.Buffer
-	b.Grow(limit)
-	for limit > 0 && !it.Done() {
-		b.Write(it.Next())
+	var b strings.Builder
+
+	if endASCII > 0 {
+		b.WriteString(s[:endASCII])
+	}
+	g := uniseg.NewGraphemes(s[endASCII:])
+	for g.Next() && limit > 0 {
+		ru := g.Runes()
+		for _, r := range ru {
+			b.WriteRune(r)
+		}
 		limit--
 	}
+
 	return b.String()
 }
